@@ -1,103 +1,173 @@
-import Image from "next/image";
+// 'use client'
+
+// import { useState, useEffect } from 'react'
+// import { useRouter } from 'next/navigation'
+// import { useAuth } from './context/AuthContext'
+// import { useTasks } from './context/TaskContext'
+// import api from './lib/api'            // ← import your Axios wrapper
+// import TaskList from './components/TaskList'
+// import RecurrenceForm from './components/RecurrenceForm'
+// import TaskForm from './components/TaskForm'
+// import DatePicker from './components/DatePicker'
+
+// export default function Home() {
+//   const { user } = useAuth()
+//   const router = useRouter()
+//   const { state, a,dispatch } = useTasks()
+
+//   const [showList,setShowList]=useState();
+
+//   // form state
+//   const [title, setTitle] = useState('')
+//   const [description, setDescription] = useState('')
+//   const [dueDate, setDueDate] = useState('')
+//   const [priority, setPriority] = useState('medium')
+//   const [status, setStatus] = useState('pending')
+
+//   //recurrence form state
+//   const [frequency, setFrequency] = useState('daily')
+//   const [interval, setInterval] = useState(1)
+//   const [daysOfWeek, setDaysOfWeek] = useState([])    // e.g. ['Mon','Wed']
+//   const [startDate, setStartDate] = useState('')
+//   const [endDate, setEndDate] = useState('')
+
+//   useEffect(() => {
+//     if (user === null) router.push('/login')
+//   }, [user])
+
+//   useEffect(() => {
+//     api.get('/task/get').then(res =>
+//       dispatch({ type: 'SET_TASKS', payload: res.data })
+//     );
+//   },[showList]);
+
+//   const addTask = async () => {
+//     const payload = {
+//       title,
+//       description,
+//       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+//       priority,
+//       status,
+//     }
+
+//     try {
+//       const res = await api.post('/task/create', payload)
+//       const newTask=res.data;
+//       dispatch({ type: 'ADD_TASK', payload: res.data })
+
+//       const recPayload = {
+//         taskId: newTask.id,
+//         frequency,
+//         interval,
+//         daysOfWeek,
+//         startDate: startDate ? new Date(startDate).toISOString() : null,
+//         endDate: endDate ? new Date(endDate).toISOString() : null,
+//       }
+
+//       await api.post('/recurrence/create', recPayload)
+//       // clear form
+//       setTitle('')
+//       setDescription('')
+//       setDueDate('')
+//       setPriority('medium')
+//       setStatus('pending')
+
+     
+//     } catch (err) {
+//       console.error('Failed to create task', err)
+//       alert('Could not create task.')
+//     }
+//   }
+
+//   return (
+//     <div className="min-h-screen p-6 bg-gray-100">
+//       <div className="flex justify-between items-center mb-6">
+//         <h1 className="text-3xl font-bold">TickTick Clone</h1>
+//         <button
+//           onClick={() => { localStorage.removeItem('token'); router.push('/login') }}
+//           className="px-4 py-2 bg-red-500 text-white rounded"
+//         >
+//           Logout
+//         </button>
+       
+//       </div>
+//       <TaskForm/>
+//       <TaskList tasks={state.tasks} />
+//     </div>
+//   )
+// }
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from './context/AuthContext'
+import { useTasks } from './context/TaskContext'
+import api from './lib/api'
+import TaskList from './components/TaskList'
+import TaskForm from './components/TaskForm'
+import { Plus } from 'lucide-react'
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { user } = useAuth()
+  const router = useRouter()
+  const { state, dispatch } = useTasks()
+  const [showForm, setShowForm] = useState(false)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (user === null) router.push('/login')
+  }, [user])
+
+  useEffect(() => {
+    api.get('/task/get').then(res =>
+      dispatch({ type: 'SET_TASKS', payload: res.data })
+    )
+  }, [showForm])
+
+  const toggleForm = () => setShowForm(prev => !prev)
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+      {/* Header */}
+      <div className="title-logout-container flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800">🗓️ TickTick Clone</h1>
+        <button
+          onClick={() => {
+            localStorage.removeItem('token')
+            router.push('/login')
+          }}
+          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* Add Task Button */}
+      <div className="flex  justify-center mb-8">
+        <button
+          onClick={toggleForm}
+          className="text-2xl text-center flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition"
+        >
+          <Plus className="w-5 h-5 " /> Add Task
+        </button>
+      </div>
+
+      {/* Task Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg relative animate-fadeIn">
+            <button
+              onClick={toggleForm}
+              className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition"
+            >
+              ✖
+            </button>
+            <TaskForm onTaskCreated={toggleForm} />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      {/* Task List */}
+      <TaskList tasks={state.tasks} />
     </div>
-  );
+  )
 }
